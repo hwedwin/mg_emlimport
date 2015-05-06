@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="lib/cassandra-driver-core-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jargs.2_0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

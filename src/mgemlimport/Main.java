@@ -11,15 +11,33 @@ import mgcommon.Session;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.sanityinc.jargs.CmdLineParser.OptionException;
+
 public class Main {
     private static Logger logger = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
+        EmailCmdLineParser cmdParser = new EmailCmdLineParser();
+        try {
+            cmdParser.parse(args);
+            if (cmdParser.toHelp() || cmdParser.getRemainingArgs().length == 0) {
+                cmdParser.printUsage();
+                System.exit(0);
+            }
+        } catch (OptionException e1) {
+            cmdParser.printUsage();
+            System.exit(1);
+        }
+
+        EmailParser parser = new EmailParser(false);
         Session session = DBManager.getSession();
         EmailDBManager emlDBManager = new EmailDBManager(session);
         EmailAttachImporter emlAttachImporter = new EmailAttachImporter(session);
-        EmailIndexManager emlIndexManager = new EmailIndexManager();
-        EmailParser parser = new EmailParser(false);
+        EmailIndexManager emlIndexManager = null;
+        boolean doIndex = !cmdParser.isNoIndex();
+        if (doIndex) {
+            emlIndexManager = new EmailIndexManager();
+        }
 
         try {
             if (!emlDBManager.emlObjTablesExist()) {
@@ -35,30 +53,35 @@ public class Main {
         }
 
         logger.info("To import email to DB");
-        for (int i = 0; i < args.length; ++i) {
+        String[] eml_files = cmdParser.getRemainingArgs();
+        for (int i = 0; i < eml_files.length; ++i) {
             try {
-                logger.info("To parse file " + args[i]);
-                Email email = parser.parse(args[i]);
+                logger.info("To parse file " + eml_files[i]);
+                Email email = parser.parse(eml_files[i]);
                 // Now DB operation...
                 // Create Object
-                logger.info("To import email " + args[i]);
+                logger.info("To import email " + eml_files[i]);
                 UUID objId = emlDBManager.newEmlObject(email);
                 // Create Properties
                 emlDBManager.newEmlProperties(email, objId);
                 // Index this object
-                emlIndexManager.indexObject(objId);
+                if (doIndex) {
+                    emlIndexManager.indexObject(objId);
+                }
                 // Import the attached files
                 for (EmailAttachInfo eai : email.attaches) {
                     UUID fid = emlAttachImporter.importAttach(eai, objId);
-                    emlIndexManager.indexAttach(eai, fid);
+                    if (doIndex) {
+                        emlIndexManager.indexAttach(eai, fid);
+                    }
                 }
             } catch (MessagingException | IOException e) {
-                logger.fatal("Failed to parser " + args[i]);
+                logger.fatal("Failed to parser " + eml_files[i]);
                 logger.fatal(e.getMessage());
                 e.printStackTrace();
                 System.exit(3);
             } catch (MGEmlImportException e) {
-                logger.fatal("Failed to import " + args[i]);
+                logger.fatal("Failed to import " + eml_files[i]);
                 logger.fatal(e.getMessage());
                 e.printStackTrace();
                 System.exit(4);

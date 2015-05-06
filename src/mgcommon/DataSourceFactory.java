@@ -60,7 +60,7 @@ public class DataSourceFactory {
         return null;
     }
 
-    public static UUID getMEDByUserId(int uid, Session session) {
-            return null;
+    public static UUID getMEDByUserId(int uid, Session session) throws IDNotFoundException {
+            throw new IDNotFoundException("This is a mock class");
     }
 }

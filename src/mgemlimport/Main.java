@@ -7,6 +7,7 @@ import javax.mail.MessagingException;
 
 import mgcommon.DBManager;
 import mgcommon.DataSourceFactory;
+import mgcommon.IDNotFoundException;
 import mgcommon.Session;
 
 import org.apache.log4j.LogManager;
@@ -41,7 +42,7 @@ public class Main {
         UUID dsid = null;
         try {
             dsid = DataSourceFactory.getMEDByUserId(userId, session);
-        } catch (Exception e) {
+        } catch (IDNotFoundException e) {
             System.err.println("User with id " + userId + " not found.");
             System.exit(3);
         }

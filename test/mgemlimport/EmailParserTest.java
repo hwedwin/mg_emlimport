@@ -4,12 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 import javax.mail.MessagingException;
 
@@ -59,4 +57,28 @@ public class EmailParserTest {
         System.out.println(email.getHeadersText());
         assertTrue(email.getHeadersText().contains("From: 刘劲松 <zjj_ljs@163.com>"));
     }
+    
+    @Test
+    public void contentTypeTest1() throws MessagingException, IOException {
+        File is = new File("test_data/mgemlimport/多个附件测试.eml");
+
+        Email email = this.parser.parse(is);
+        EmailAttachInfo eai = email.attaches.get(0);
+        System.out.println(eai.mimeType);
+        assertEquals ("application", eai.getCategory());
+        assertEquals ("msword", eai.getType());
+    }
+    
+    @Test
+    public void contentTypeTest2() throws MessagingException, IOException {
+        File is = new File("test_data/mgemlimport//0000000128.eml");
+
+        Email email = this.parser.parse(is);
+        EmailAttachInfo eai = email.attaches.get(0);
+        System.out.println(eai.mimeType);
+        assertEquals ("application", eai.getCategory());
+        assertEquals ("pdf", eai.getType());
+    }
+
+
 }

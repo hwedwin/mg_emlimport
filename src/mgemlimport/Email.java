@@ -189,4 +189,5 @@ public class Email {
     public String content;
     public List<String> headers;
     public List<EmailAttachInfo> attaches;
+    public String emlFile = null;
 }

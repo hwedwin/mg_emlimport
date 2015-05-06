@@ -57,6 +57,7 @@ public class EmailParser {
     public Email parse(File inputFile) throws MessagingException, IOException {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(inputFile));
         Email email = this.parse(bis);
+        email.emlFile = inputFile.getName();
         bis.close();
         return email;
 
@@ -160,8 +161,11 @@ public class EmailParser {
                 Multipart mpp = (Multipart) p.getContent();
                 parseMultipart(email, mpp);
             } else if (p instanceof MimeBodyPart) {
-                String mimeType = p.getContentType();
                 MimeBodyPart mbp = (MimeBodyPart) p;
+                //MimeType is something like: application/pdf; "name=xxxxx.pdf", so we get the first part.
+                String mimeType = mbp.getContentType();
+                if (mimeType != null)
+                    mimeType=mimeType.split(";")[0];
                 // Only save attachments
                 String disp = mbp.getDisposition();
                 if (disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)) {

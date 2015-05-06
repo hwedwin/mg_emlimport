@@ -127,6 +127,9 @@ public class EmailDBManager {
             case "senddate":
                 newDateProperty(email.sendDate, objId, propMap.get(k));
                 break;
+            case "emlfile":
+                newTextProperty(email.emlFile, objId, propMap.get(k));
+                break;
             default:
                 logger.error("Unknow property " + k);
                 break;

@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import mgcommon.DBManager;
+import mgcommon.DataSourceFactory;
 import mgcommon.Session;
 
 import org.apache.log4j.LogManager;
@@ -28,9 +29,24 @@ public class Main {
             cmdParser.printUsage();
             System.exit(1);
         }
+        
+        Integer userId = cmdParser.getUserId();
+        if (userId == null) {
+            cmdParser.printUsage();
+            System.exit(2);
+        }
+        
+        Session session = DBManager.getSession();
+        // Get dsid and verify if the userid is valid.
+        UUID dsid = null;
+        try {
+            dsid = DataSourceFactory.getMEDByUserId(userId, session);
+        } catch (Exception e) {
+            System.err.println("User with id " + userId + " not found.");
+            System.exit(3);
+        }
 
         EmailParser parser = new EmailParser(false);
-        Session session = DBManager.getSession();
         EmailDBManager emlDBManager = new EmailDBManager(session);
         EmailAttachImporter emlAttachImporter = new EmailAttachImporter(session);
         EmailIndexManager emlIndexManager = null;
@@ -61,7 +77,7 @@ public class Main {
                 // Now DB operation...
                 // Create Object
                 logger.info("To import email " + eml_files[i]);
-                UUID objId = emlDBManager.newEmlObject(email);
+                UUID objId = emlDBManager.newEmlObject(email, dsid, userId);
                 // Create Properties
                 emlDBManager.newEmlProperties(email, objId);
                 // Index this object

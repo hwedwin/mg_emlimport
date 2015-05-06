@@ -8,13 +8,19 @@ import com.sanityinc.jargs.CmdLineParser;
 public class EmailCmdLineParser extends CmdLineParser {
     private List<String> helpMessages;
     private Option<Boolean> noindex;
+    private Option<Integer> userId;
     private Option<Boolean> help;
 
     public EmailCmdLineParser() {
         super();
         this.helpMessages = new LinkedList<String>();
-        this.noindex = this.addHelp(this.addBooleanOption('n', "noindex"), "Don't do index, only save to database.");
-        this.help = this.addHelp(this.addBooleanOption('h', "help"), "Print out this message.");
+        this.userId = this.addHelp(this.addIntegerOption('u', "userId"), "Required. Specify your user ID.");
+        this.noindex = this.addHelp(this.addBooleanOption('n', "noindex"), "Optional. Don't do index, only save to database. default false.");
+        this.help = this.addHelp(this.addBooleanOption('h', "help"), "Optional. Print out this message.");
+    }
+    
+    public Integer getUserId () {
+        return this.getOptionValue(this.userId);
     }
 
     public Boolean isNoIndex() {
@@ -34,7 +40,7 @@ public class EmailCmdLineParser extends CmdLineParser {
         }
     }
 
-    public Option addHelp(Option option, String help) {
+    public <T> Option<T> addHelp(Option<T> option, String help) {
         this.helpMessages.add("\t-" + option.shortForm() + "/--" + option.longForm() + "\t" + help);
         return option;
     }

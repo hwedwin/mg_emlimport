@@ -47,7 +47,7 @@ public class EmailDBManagerTest {
     @Test
     public void newObjectTest () throws MessagingException, IOException, MGEmlImportException {
         Email email = this.parser.parse("test_data/mgemlimport/my163_test.eml");
-        UUID objId = dbManager.newEmlObject(email);
+        UUID objId = dbManager.newEmlObject(email, UUID.randomUUID(), 1);
         assertTrue (objId != null);
         System.out.println("objId:" + objId);
         dbManager.newEmlProperties(email, objId);

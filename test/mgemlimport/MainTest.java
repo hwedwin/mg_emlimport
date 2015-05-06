@@ -33,7 +33,7 @@ public class MainTest {
         Email email = parser.parse("test_data/mgemlimport/多个附件测试.eml");
         // Now DB operation...
         // Create Object
-        UUID objId = emlDBManager.newEmlObject(email);
+        UUID objId = emlDBManager.newEmlObject(email, UUID.randomUUID(), 1);
         // Create Properties
         emlDBManager.newEmlProperties(email, objId);
         // Import the attached files

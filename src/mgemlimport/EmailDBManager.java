@@ -59,7 +59,7 @@ public class EmailDBManager {
         logger.debug("Object table mgproperty.t_" + typeId + " created.");
     }
 
-    public UUID newEmlObject(Email email) throws MGEmlImportException {
+    public UUID newEmlObject(Email email, UUID dsid, int userId) throws MGEmlImportException {
         // Referenced mgupdate2.NewObject
         if (objectType == null) {
             objectType = this.getMGEmlObjectType();
@@ -69,8 +69,8 @@ public class EmailDBManager {
         UUID objId = MGObjectFactory.newID(objectTypeId);
         Date now = Calendar.getInstance().getTime();
 
-        String cql = "insert into mgobject.t_" + tbl_suffix + "(id, object_type, created_on) values (?,?,?)";
-        session.execute(session.prepare(cql).bind(objId, objectTypeId, now));
+        String cql = "insert into mgobject.t_" + tbl_suffix + "(id, label, object_type, created_on, created_by, data_source) values (?,?,?,?,?,?)";
+        session.execute(session.prepare(cql).bind(objId, email.subject, objectTypeId, now, userId, dsid));
 
         return objId;
     }
@@ -137,13 +137,13 @@ public class EmailDBManager {
     private void newTextProperty(String value, UUID objId, PropertyType propType) throws MGEmlImportException {
         if (value == null || value.isEmpty())
             return;
-        newProperty(value, objId, propType, "text");
+        newProperty(value, objId, propType, "Text");
     }
 
     private void newDateProperty(Date value, UUID objId, PropertyType propType) throws MGEmlImportException {
         if (value == null)
             return;
-        newProperty(value, objId, propType, "date");
+        newProperty(value, objId, propType, "Date");
     }
 
     private void newProperty(Object value, UUID objId, PropertyType propType, String baseType) throws MGEmlImportException {
